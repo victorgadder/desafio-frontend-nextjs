@@ -4,6 +4,63 @@ Todas as mudanças relevantes deste projeto serão documentadas neste arquivo.
 
 O formato segue uma versão simplificada do [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), com agrupamento por versão e por tipo de alteração.
 
+## [0.1.9] - 2026-06-15
+
+### Alterado
+
+- Renomeada a ação compacta de envio por teclado para "Enviar com ENTER".
+- Transformada a opção de envio por ENTER em um toggle visual.
+- Reduzido o espaçamento entre textarea e botões no composer mobile.
+- Alinhadas as ações do composer à direita para seguir um padrão mais comum de envio.
+
+### Técnico
+
+- Mantido `aria-pressed` no toggle para preservar semântica acessível.
+- Ajustadas classes responsivas de espaçamento e largura dos botões no composer.
+
+## [0.1.8] - 2026-06-15
+
+### Alterado
+
+- Compactado o composer no mobile para reduzir o espaço entre campo de texto e botões.
+- Ajustados os botões do composer no mobile para ficarem menores e alinhados na mesma linha.
+- O botão de envio agora permanece ao lado das ações de ENTER e IA em telas pequenas.
+- Aumentado o botão de voltar do header mobile do chat para melhorar toque e visibilidade.
+
+### Técnico
+
+- Usadas classes responsivas para manter botões compactos no mobile e confortáveis no desktop.
+- Mantido texto acessível via `aria-label` no botão de envio com ENTER.
+
+## [0.1.7] - 2026-06-15
+
+### Alterado
+
+- Ajustada a experiência mobile para funcionar como navegação lista-conversa.
+- No mobile, a tela inicial mostra apenas a lista de contatos.
+- Ao selecionar uma conversa no mobile, o chat ocupa a tela e exibe um botão de voltar no header.
+- O header mobile do chat passou a exibir botão voltar, avatar, nome e telefone do contato.
+- No desktop, a lista e o chat continuam lado a lado.
+
+### Técnico
+
+- Adicionado controle de viewport mobile com `matchMedia`.
+- Separado o estado de abertura do chat no mobile do estado de conversa selecionada.
+- Usadas classes responsivas para alternar visibilidade dos painéis sem afetar o layout desktop.
+
+## [0.1.6] - 2026-06-15
+
+### Adicionado
+
+- Adicionada opção "Enviar mensagem com ENTER" no composer.
+- Quando ativada, a tecla `Enter` envia a mensagem e `Shift + Enter` continua permitindo quebra de linha.
+- Adicionado `enterKeyHint="send"` para sugerir ação de envio em teclados digitais no mobile.
+
+### Técnico
+
+- Centralizado o envio do rascunho em uma função compartilhada entre submit do formulário e atalho de teclado.
+- Usado `aria-pressed` para comunicar o estado do botão alternável.
+
 ## [0.1.5] - 2026-06-15
 
 ### Alterado

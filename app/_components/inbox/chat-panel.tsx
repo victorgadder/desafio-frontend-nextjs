@@ -13,6 +13,8 @@ export function ChatPanel({
   isFetching,
   isError,
   onRetry,
+  onBack,
+  showBackButton,
   messagesEndRef,
 }: {
   conversation?: Conversation;
@@ -21,6 +23,8 @@ export function ChatPanel({
   isFetching: boolean;
   isError: boolean;
   onRetry: () => void;
+  onBack: () => void;
+  showBackButton: boolean;
   messagesEndRef: RefObject<HTMLDivElement | null>;
 }) {
   if (!conversation) {
@@ -36,15 +40,25 @@ export function ChatPanel({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col border-b border-slate-200">
-      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 px-4 py-3">
-        <div className="flex min-w-0 items-center gap-3">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-200 px-3 py-3 sm:px-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          {showBackButton ? (
+            <button
+              className="grid size-14 shrink-0 place-items-center rounded-full text-4xl leading-none text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 lg:hidden"
+              type="button"
+              aria-label="Voltar para a lista de conversas"
+              onClick={onBack}
+            >
+              <span aria-hidden="true">‹</span>
+            </button>
+          ) : null}
           <Avatar conversation={conversation} />
           <div className="min-w-0">
             <h2 className="truncate text-base font-semibold">{conversation.contactName}</h2>
             <p className="truncate text-sm text-slate-500">{formatPhone(conversation.contactPhone)}</p>
           </div>
         </div>
-        <div className="text-right text-xs text-slate-500">
+        <div className="hidden text-right text-xs text-slate-500 sm:block">
           <p>{isFetching ? "Atualizando" : "Sincronizado"}</p>
           <p>{formatConversationDate(conversation.lastMessageAt)}</p>
         </div>

@@ -56,6 +56,9 @@ export function InboxApp() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [draft, setDraft] = useState("");
+  const [sendWithEnter, setSendWithEnter] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
   const [composerError, setComposerError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -73,10 +76,20 @@ export function InboxApp() {
   const conversations = conversationsQuery.data ?? EMPTY_CONVERSATIONS;
 
   useEffect(() => {
-    if (!selectedConversationId && conversations.length > 0) {
+    const mediaQuery = window.matchMedia("(max-width: 1023px)");
+    const updateViewport = () => setIsMobileViewport(mediaQuery.matches);
+
+    updateViewport();
+    mediaQuery.addEventListener("change", updateViewport);
+
+    return () => mediaQuery.removeEventListener("change", updateViewport);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileViewport && !selectedConversationId && conversations.length > 0) {
       setSelectedConversationId(conversations[0].id);
     }
-  }, [conversations, selectedConversationId]);
+  }, [conversations, isMobileViewport, selectedConversationId]);
 
   const selectedConversation = conversations.find(
     (conversation) => conversation.id === selectedConversationId,
@@ -168,34 +181,51 @@ export function InboxApp() {
 
   function handleSelectConversation(conversationId: string) {
     setSelectedConversationId(conversationId);
+    setIsMobileChatOpen(true);
     setComposerError(null);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function handleBackToConversations() {
+    setIsMobileChatOpen(false);
+    setComposerError(null);
+  }
+
+  function sendDraftMessage() {
     const text = draft.trim();
     if (!selectedConversationId || !text || sendMutation.isPending) return;
 
     sendMutation.mutate({ conversationId: selectedConversationId, text });
   }
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    sendDraftMessage();
+  }
+
   const isConversationsLoading = conversationsQuery.isLoading;
   const hasConversationsError = conversationsQuery.isError;
+  const showMobileChat = isMobileChatOpen && Boolean(selectedConversation);
 
   return (
     <main className="h-dvh overflow-hidden bg-[#f5f7f8] text-slate-950">
       <div className="mx-auto flex h-full w-full max-w-7xl flex-col px-4 py-4 sm:px-6 lg:px-8">
-        <AppHeader
-          agent={meQuery.data}
-          isLoading={meQuery.isLoading}
-          isError={meQuery.isError}
-          isSyncing={meQuery.isFetching || conversationsQuery.isFetching}
-          isOffline={meQuery.isError || conversationsQuery.isError}
-          onRetry={() => meQuery.refetch()}
-        />
+        <div className={showMobileChat ? "hidden lg:block" : undefined}>
+          <AppHeader
+            agent={meQuery.data}
+            isLoading={meQuery.isLoading}
+            isError={meQuery.isError}
+            isSyncing={meQuery.isFetching || conversationsQuery.isFetching}
+            isOffline={meQuery.isError || conversationsQuery.isError}
+            onRetry={() => meQuery.refetch()}
+          />
+        </div>
 
-        <section className="grid min-h-0 flex-1 grid-rows-[minmax(180px,32vh)_minmax(0,1fr)] gap-4 lg:grid-cols-[380px_minmax(0,1fr)] lg:grid-rows-1">
-          <aside className="flex min-h-0 flex-col overflow-hidden rounded border border-slate-200 bg-white">
+        <section className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[380px_minmax(0,1fr)]">
+          <aside
+            className={`min-h-0 flex-col overflow-hidden rounded border border-slate-200 bg-white lg:flex ${
+              showMobileChat ? "hidden" : "flex"
+            }`}
+          >
             <div className="shrink-0 border-b border-slate-200 p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
@@ -231,7 +261,11 @@ export function InboxApp() {
             </div>
           </aside>
 
-          <section className="flex min-h-0 flex-col overflow-hidden rounded border border-slate-200 bg-white">
+          <section
+            className={`min-h-0 flex-col overflow-hidden rounded border border-slate-200 bg-white lg:flex ${
+              showMobileChat ? "flex" : "hidden"
+            }`}
+          >
             <ChatPanel
               conversation={selectedConversation}
               messages={messagesQuery.data ?? []}
@@ -239,6 +273,8 @@ export function InboxApp() {
               isFetching={messagesQuery.isFetching}
               isError={messagesQuery.isError}
               onRetry={() => messagesQuery.refetch()}
+              onBack={handleBackToConversations}
+              showBackButton={showMobileChat}
               messagesEndRef={messagesEndRef}
             />
 
@@ -247,9 +283,12 @@ export function InboxApp() {
               disabled={!selectedConversationId}
               isSending={sendMutation.isPending}
               isSuggesting={suggestionMutation.isPending}
+              sendWithEnter={sendWithEnter}
               error={composerError}
               onChange={setDraft}
+              onSendWithEnterChange={setSendWithEnter}
               onSubmit={handleSubmit}
+              onSendRequest={sendDraftMessage}
               onSuggest={() => {
                 if (selectedConversationId) suggestionMutation.mutate(selectedConversationId);
               }}
