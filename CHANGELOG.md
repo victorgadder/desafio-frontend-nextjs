@@ -4,6 +4,17 @@ Todas as mudanças relevantes deste projeto serão documentadas neste arquivo.
 
 O formato segue uma versão simplificada do [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), com agrupamento por versão e por tipo de alteração.
 
+## [0.1.3] - 2026-06-15
+
+### Alterado
+
+- Adicionados atributos de acessibilidade ao item de conversa selecionado.
+- A conversa ativa agora informa seu estado com `aria-current` e `aria-pressed`, além do destaque visual.
+
+### Técnico
+
+- Melhorada a navegação com tecnologias assistivas sem alterar o comportamento visual da lista.
+
 ## [0.1.2] - 2026-06-15
 
 ### Alterado

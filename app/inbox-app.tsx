@@ -462,6 +462,8 @@ function ConversationList({
               selectedConversationId === conversation.id ? "bg-emerald-50" : ""
             }`}
             type="button"
+            aria-current={selectedConversationId === conversation.id ? "true" : undefined}
+            aria-pressed={selectedConversationId === conversation.id}
             onClick={() => onSelectConversation(conversation.id)}
           >
             <Avatar conversation={conversation} />
