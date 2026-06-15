@@ -1,8 +1,8 @@
 # Inbox de Atendimento WhatsApp com IA
 
-Frontend em Next.js para um painel de atendimento via WhatsApp. A aplicacao consome a API fornecida pelo desafio e entrega lista de conversas, historico do chat, envio de mensagens com atualizacao otimista e sugestao de resposta com IA.
+Frontend em Next.js para um painel de atendimento via WhatsApp. A aplicação consome a API fornecida pelo desafio e entrega lista de conversas, histórico do chat, envio de mensagens com atualização otimista e sugestão de resposta com IA.
 
-## Como rodar
+## Como Rodar
 
 ```bash
 npm install
@@ -12,7 +12,7 @@ npm run dev
 
 Acesse http://localhost:3000.
 
-A URL da API ja vem configurada em `.env.example`:
+A URL da API já vem configurada em `.env.example`:
 
 ```bash
 NEXT_PUBLIC_API_URL=https://8tymn68hp9.execute-api.us-east-1.amazonaws.com
@@ -22,78 +22,127 @@ NEXT_PUBLIC_API_URL=https://8tymn68hp9.execute-api.us-east-1.amazonaws.com
 
 ```bash
 npm run dev        # ambiente local
-npm run lint       # validacao de lint
+npm run lint       # validação de lint
 npm run typecheck  # checagem TypeScript
-npm run build      # build de producao
+npm run build      # build de produção
 ```
 
-## O que foi implementado
+## O Que Foi Implementado
 
-- Lista de conversas com busca por nome, telefone e ultima mensagem.
-- Indicador de nao lidas, ultima mensagem e horario da conversa.
+- Lista de conversas com busca por nome, telefone e última mensagem.
+- Indicador de não lidas, última mensagem e horário da conversa.
 - Tela de chat com bolhas separando cliente e atendente.
-- Envio de mensagem com atualizacao otimista.
-- Botao para sugerir resposta com IA usando `POST /ai/suggest`.
-- Estados de loading, erro e vazio para lista, chat e composicao.
+- Envio de mensagem com atualização otimista.
+- Botão para sugerir resposta com IA usando `POST /ai/suggest`.
+- Toggle `Enviar com ENTER`, mantendo `Shift + Enter` para quebra de linha.
+- Estados de loading, erro e vazio para lista, chat e composição.
 - Polling para manter conversas e mensagens sincronizadas.
-- Layout responsivo com foco em uso de inbox operacional.
+- Badge de status com `Online`, `Sincronizando` e `Offline`.
+- Layout desktop com lista e chat lado a lado.
+- Layout mobile em fluxo lista-conversa, com botão de voltar no chat.
+- Rolagem interna na lista e no histórico, mantendo o composer fixo no rodapé.
+- `CHANGELOG.md` versionando as principais mudanças do projeto.
 
-## Decisoes de arquitetura
+## Decisões De Arquitetura
 
-### Server e Client Components
+### Server E Client Components
 
-`app/page.tsx` fica como Server Component simples e renderiza `InboxApp`. A interface principal esta em `app/inbox-app.tsx` como Client Component porque depende de estado local, eventos de formulario, React Query, polling e mutacoes.
+`app/page.tsx` fica como Server Component simples e renderiza `InboxApp`. Ele não precisa de estado, eventos ou APIs do navegador.
 
-Essa separacao deixa a rota limpa e evita transformar mais componentes do que o necessario em componentes interativos.
+A interface principal fica em `app/inbox-app.tsx` como Client Component porque depende de estado local, eventos de formulário, React Query, polling, mutações, `matchMedia` e manipulação de interação do usuário.
 
-### API centralizada
+Essa separação deixa a rota limpa e torna explícito que a interatividade pertence à camada client-side.
 
-O arquivo `lib/api.ts` continua sendo o contrato de comunicacao com o backend. A UI importa funcoes como `getConversations`, `getMessages`, `sendMessage` e `suggestReply`, sem conhecer detalhes de Axios, base URL ou rotas.
+### Organização De Componentes
 
-Isso facilita testes futuros e reduz acoplamento entre tela e transporte HTTP.
+A feature do inbox foi separada em componentes internos dentro de `app/_components/inbox`:
+
+- `app-header.tsx`: cabeçalho do produto, agente e status de sincronização.
+- `conversation-list.tsx`: lista, busca, estados vazios, erro e loading.
+- `chat-panel.tsx`: header da conversa, histórico e estados do chat.
+- `composer.tsx`: textarea, envio, sugestão de IA e toggle de ENTER.
+- `message-bubble.tsx`: bolhas de mensagens.
+- `avatar.tsx`, `sync-badge.tsx`, `state-message.tsx` e `message-skeleton.tsx`: peças reutilizáveis de UI.
+- `utils.ts`: formatação de datas, telefone, iniciais e busca local.
+
+Com isso, `InboxApp` concentra a orquestração: seleção de conversa, queries, mutations, cache, polling e estado do mobile.
+
+### API Centralizada
+
+O arquivo `lib/api.ts` continua sendo o contrato de comunicação com o backend. A UI importa funções como `getConversations`, `getMessages`, `sendMessage` e `suggestReply`, sem conhecer detalhes de Axios, base URL ou rotas.
+
+Isso reduz acoplamento entre interface e transporte HTTP e facilita testes futuros.
 
 ### React Query
 
-React Query foi usado para cache, loading, erro, polling e invalidacao:
+React Query foi usado para cache, loading, erro, polling, invalidação e atualização otimista:
 
 - `["me"]` carrega o atendente logado.
 - `["conversations"]` carrega a lista e faz polling a cada 10 segundos.
-- `["messages", conversationId]` carrega o historico da conversa selecionada e faz polling a cada 6 segundos.
+- `["messages", conversationId]` carrega o histórico da conversa selecionada e faz polling a cada 6 segundos.
 
-Escolhi polling por ser suficiente para o escopo do desafio e simples de defender. Em producao, eu avaliaria WebSocket ou Server-Sent Events para reduzir latencia e chamadas repetidas.
+Escolhi polling por ser suficiente para o escopo do desafio e simples de defender. Em produção, eu avaliaria WebSocket ou Server-Sent Events para reduzir latência e chamadas repetidas.
 
-### Atualizacao otimista
+### Atualização Otimista
 
-No envio de mensagem, a mensagem aparece imediatamente no chat antes da resposta do servidor. A mutacao:
+No envio de mensagem, a mensagem aparece imediatamente no chat antes da resposta do servidor. A mutação:
 
 1. Cancela queries em andamento da conversa.
 2. Salva snapshots de mensagens e conversas.
-3. Insere uma mensagem temporaria no cache.
+3. Insere uma mensagem temporária no cache.
 4. Atualiza o preview da conversa.
-5. Troca a mensagem temporaria pela resposta real quando o backend confirma.
+5. Troca a mensagem temporária pela resposta real quando o backend confirma.
 6. Restaura o estado anterior se houver erro.
 
-Essa escolha melhora a percepcao de velocidade sem esconder falhas, porque em caso de erro o texto volta para o campo de composicao.
+Essa escolha melhora a percepção de velocidade sem esconder falhas, porque em caso de erro o texto volta para o campo de composição.
 
-### UX e acessibilidade
+### Sincronização E Falhas Parciais
 
-A tela usa controles nativos (`button`, `input`, `textarea`, `form`) para manter boa acessibilidade basica. Tambem foram adicionados:
+O estado do perfil do agente (`/me`) foi separado do estado da lista (`/conversations`). Se o perfil falhar, o header mostra um estado próprio e oferece retry, mas a lista continua disponível se as conversas carregarem corretamente.
+
+O badge geral de sincronização usa os estados das queries principais para exibir `Online`, `Sincronizando` ou `Offline`.
+
+### Experiência Mobile
+
+No desktop, a interface mantém o padrão de inbox: lista à esquerda e chat à direita.
+
+No mobile, a experiência muda para um fluxo mais próximo do WhatsApp:
+
+- primeiro aparece a lista de contatos;
+- ao tocar em uma conversa, o chat ocupa a tela;
+- o header do chat mostra botão de voltar, avatar, nome e telefone;
+- o composer fica fixo no rodapé;
+- mensagens e lista têm rolagem interna.
+
+O estado de abertura do chat mobile é separado do estado da conversa selecionada para preservar o comportamento desktop e evitar renderizar lista e chat empilhados.
+
+### UX E Acessibilidade
+
+A tela usa controles nativos (`button`, `input`, `textarea`, `form`) para manter acessibilidade básica. Também foram adicionados:
 
 - `sr-only` em labels visuais.
-- `aria-label` em skeletons.
+- `aria-label` em skeletons e botões iconográficos.
 - `role="alert"` para erros do composer.
-- foco visivel em botoes e campos.
-- estados vazios e mensagens de erro com acao de tentar novamente.
+- `aria-live="polite"` no badge de sincronização.
+- `aria-current` e `aria-pressed` na conversa selecionada.
+- `aria-pressed` no toggle `Enviar com ENTER`.
+- foco visível em botões e campos.
+- estados vazios e mensagens de erro com ação de tentar novamente.
 
-## O que faria com mais tempo
+## O Que Faria Com Mais Tempo
 
-- Adicionar testes com React Testing Library para busca, envio otimista e erro de mutacao.
-- Usar WebSocket ou SSE para atualizacao em tempo real.
+- Adicionar testes com React Testing Library para busca, envio otimista, erro de mutação e fluxo mobile lista-conversa.
+- Usar WebSocket ou SSE para atualização em tempo real.
 - Marcar mensagens como lidas ao abrir a conversa, se a API oferecesse essa rota.
-- Separar `InboxApp` em componentes menores por pasta quando a tela crescesse.
-- Adicionar virtualizacao se a lista de mensagens pudesse ficar muito grande.
+- Persistir a preferência `Enviar com ENTER` no `localStorage`.
+- Adicionar animações leves na transição mobile entre lista e chat.
+- Adicionar virtualização se a lista de mensagens pudesse ficar muito grande.
 
-## Validacao
+## Changelog
+
+As mudanças relevantes estão versionadas em [CHANGELOG.md](CHANGELOG.md).
+
+## Validação
 
 Os comandos abaixo foram executados com sucesso:
 
