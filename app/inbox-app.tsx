@@ -59,6 +59,7 @@ export function InboxApp() {
   const [sendWithEnter, setSendWithEnter] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [composerError, setComposerError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -83,6 +84,11 @@ export function InboxApp() {
     mediaQuery.addEventListener("change", updateViewport);
 
     return () => mediaQuery.removeEventListener("change", updateViewport);
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    setIsDarkTheme(mediaQuery.matches);
   }, []);
 
   useEffect(() => {
@@ -207,7 +213,11 @@ export function InboxApp() {
   const showMobileChat = isMobileChatOpen && Boolean(selectedConversation);
 
   return (
-    <main className="h-dvh overflow-hidden bg-[#f5f7f8] text-slate-950">
+    <main
+      className={`h-dvh overflow-hidden bg-[#f5f7f8] text-slate-950 dark:bg-slate-950 dark:text-slate-100 ${
+        isDarkTheme ? "dark" : ""
+      }`}
+    >
       <div className="mx-auto flex h-full w-full max-w-7xl flex-col px-4 py-4 sm:px-6 lg:px-8">
         <div className={showMobileChat ? "hidden lg:block" : undefined}>
           <AppHeader
@@ -216,21 +226,23 @@ export function InboxApp() {
             isError={meQuery.isError}
             isSyncing={meQuery.isFetching || conversationsQuery.isFetching}
             isOffline={meQuery.isError || conversationsQuery.isError}
+            isDarkTheme={isDarkTheme}
+            onToggleTheme={() => setIsDarkTheme((current) => !current)}
             onRetry={() => meQuery.refetch()}
           />
         </div>
 
         <section className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[380px_minmax(0,1fr)]">
           <aside
-            className={`min-h-0 flex-col overflow-hidden rounded border border-slate-200 bg-white lg:flex ${
+            className={`min-h-0 flex-col overflow-hidden rounded border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:flex ${
               showMobileChat ? "hidden" : "flex"
             }`}
           >
-            <div className="shrink-0 border-b border-slate-200 p-4">
+            <div className="shrink-0 border-b border-slate-200 p-4 dark:border-slate-800">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <h1 className="text-lg font-semibold">Conversas</h1>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     {conversations.length} atendimentos no inbox
                   </p>
                 </div>
@@ -241,7 +253,7 @@ export function InboxApp() {
                 <input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  className="h-11 w-full rounded border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+                  className="h-11 w-full rounded border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-slate-900 dark:focus:ring-emerald-900"
                   placeholder="Buscar por contato, telefone ou mensagem"
                   type="search"
                 />
@@ -262,7 +274,7 @@ export function InboxApp() {
           </aside>
 
           <section
-            className={`min-h-0 flex-col overflow-hidden rounded border border-slate-200 bg-white lg:flex ${
+            className={`min-h-0 flex-col overflow-hidden rounded border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:flex ${
               showMobileChat ? "flex" : "hidden"
             }`}
           >

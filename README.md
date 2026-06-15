@@ -38,6 +38,7 @@ npm run build      # build de produção
 - Estados de loading, erro e vazio para lista, chat e composição.
 - Polling para manter conversas e mensagens sincronizadas.
 - Badge de status com `Online`, `Sincronizando` e `Offline`.
+- Modo escuro com inicialização pela preferência do dispositivo e alternância manual por botão de sol/lua.
 - Layout desktop com lista e chat lado a lado.
 - Layout mobile em fluxo lista-conversa, com botão de voltar no chat.
 - Rolagem interna na lista e no histórico, mantendo o composer fixo no rodapé.
@@ -126,6 +127,7 @@ A tela usa controles nativos (`button`, `input`, `textarea`, `form`) para manter
 - `aria-live="polite"` no badge de sincronização.
 - `aria-current` e `aria-pressed` na conversa selecionada.
 - `aria-pressed` no toggle `Enviar com ENTER`.
+- `aria-pressed` no botão de alternância de tema.
 - foco visível em botões e campos.
 - estados vazios e mensagens de erro com ação de tentar novamente.
 

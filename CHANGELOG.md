@@ -4,6 +4,22 @@ Todas as mudanças relevantes deste projeto serão documentadas neste arquivo.
 
 O formato segue uma versão simplificada do [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), com agrupamento por versão e por tipo de alteração.
 
+## [0.2.0] - 2026-06-15
+
+### Adicionado
+
+- Adicionado modo escuro com alternância manual.
+- O tema inicial agora respeita a preferência do dispositivo via `prefers-color-scheme`.
+- Adicionado botão de tema com ícone de lua no modo claro e sol no modo escuro.
+- No desktop e tablet, o botão de tema fica à esquerda do badge de status.
+- No mobile, o botão de tema fica à direita do título do produto.
+
+### Técnico
+
+- Habilitada variante `dark` por classe no Tailwind.
+- Aplicadas cores escuras nos painéis principais, lista, chat, mensagens, composer, estados e badges.
+- Adicionado `aria-pressed` e `aria-label` ao botão de alternância de tema.
+
 ## [0.1.9] - 2026-06-15
 
 ### Alterado

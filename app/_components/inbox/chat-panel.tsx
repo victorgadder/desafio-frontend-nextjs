@@ -39,12 +39,12 @@ export function ChatPanel({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col border-b border-slate-200">
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-200 px-3 py-3 sm:px-4">
+    <div className="flex min-h-0 flex-1 flex-col border-b border-slate-200 dark:border-slate-800">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-200 px-3 py-3 dark:border-slate-800 sm:px-4">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           {showBackButton ? (
             <button
-              className="grid size-14 shrink-0 place-items-center rounded-full text-4xl leading-none text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 lg:hidden"
+              className="grid size-14 shrink-0 place-items-center rounded-full text-4xl leading-none text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-slate-200 dark:hover:bg-slate-800 lg:hidden"
               type="button"
               aria-label="Voltar para a lista de conversas"
               onClick={onBack}
@@ -55,16 +55,18 @@ export function ChatPanel({
           <Avatar conversation={conversation} />
           <div className="min-w-0">
             <h2 className="truncate text-base font-semibold">{conversation.contactName}</h2>
-            <p className="truncate text-sm text-slate-500">{formatPhone(conversation.contactPhone)}</p>
+            <p className="truncate text-sm text-slate-500 dark:text-slate-400">
+              {formatPhone(conversation.contactPhone)}
+            </p>
           </div>
         </div>
-        <div className="hidden text-right text-xs text-slate-500 sm:block">
+        <div className="hidden text-right text-xs text-slate-500 dark:text-slate-400 sm:block">
           <p>{isFetching ? "Atualizando" : "Sincronizado"}</p>
           <p>{formatConversationDate(conversation.lastMessageAt)}</p>
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto bg-[#eef4f1] px-4 py-5">
+      <div className="min-h-0 flex-1 overflow-y-auto bg-[#eef4f1] px-4 py-5 dark:bg-slate-950">
         {isLoading ? (
           <MessageSkeleton />
         ) : isError ? (

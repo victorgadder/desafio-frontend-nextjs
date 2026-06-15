@@ -35,7 +35,10 @@ export function Composer({
   }
 
   return (
-    <form className="shrink-0 space-y-1.5 bg-white p-3 sm:space-y-3 sm:p-4" onSubmit={onSubmit}>
+    <form
+      className="shrink-0 space-y-1.5 bg-white p-3 dark:bg-slate-900 sm:space-y-3 sm:p-4"
+      onSubmit={onSubmit}
+    >
       <label className="block">
         <span className="sr-only">Mensagem</span>
         <textarea
@@ -44,21 +47,24 @@ export function Composer({
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={handleKeyDown}
           enterKeyHint={sendWithEnter ? "send" : "enter"}
-          className="min-h-16 w-full resize-none rounded border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-20"
+          className="min-h-16 w-full resize-none rounded border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-slate-900 dark:focus:ring-emerald-900 sm:min-h-20"
           placeholder="Digite uma resposta para o cliente"
         />
       </label>
 
       <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-h-0 text-sm text-red-600 sm:min-h-5" role={error ? "alert" : undefined}>
+        <div
+          className="min-h-0 text-sm text-red-600 dark:text-red-400 sm:min-h-5"
+          role={error ? "alert" : undefined}
+        >
           {error}
         </div>
         <div className="flex items-center justify-end gap-1.5 sm:gap-2">
           <button
             className={`inline-flex h-9 items-center gap-2 rounded border px-2.5 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60 sm:h-10 sm:px-4 sm:text-sm ${
               sendWithEnter
-                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                : "border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
             }`}
             type="button"
             aria-pressed={sendWithEnter}
@@ -80,7 +86,7 @@ export function Composer({
             Enviar com ENTER
           </button>
           <button
-            className="h-9 rounded border border-slate-200 px-2.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60 sm:h-10 sm:px-4 sm:text-sm"
+            className="h-9 rounded border border-slate-200 px-2.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 sm:h-10 sm:px-4 sm:text-sm"
             type="button"
             disabled={disabled || isSuggesting}
             onClick={onSuggest}

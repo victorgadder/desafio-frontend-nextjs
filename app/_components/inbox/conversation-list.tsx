@@ -25,12 +25,15 @@ export function ConversationList({
       <div className="h-full overflow-y-auto p-4" aria-label="Carregando conversas">
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, index) => (
-            <div className="animate-pulse rounded border border-slate-100 p-3" key={index}>
+            <div
+              className="animate-pulse rounded border border-slate-100 p-3 dark:border-slate-800"
+              key={index}
+            >
               <div className="flex gap-3">
-                <div className="size-11 rounded-full bg-slate-200" />
+                <div className="size-11 rounded-full bg-slate-200 dark:bg-slate-700" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 w-2/3 rounded bg-slate-200" />
-                  <div className="h-3 w-full rounded bg-slate-100" />
+                  <div className="h-4 w-2/3 rounded bg-slate-200 dark:bg-slate-700" />
+                  <div className="h-3 w-full rounded bg-slate-100 dark:bg-slate-800" />
                 </div>
               </div>
             </div>
@@ -69,8 +72,8 @@ export function ConversationList({
       {conversations.map((conversation) => (
         <li key={conversation.id}>
           <button
-            className={`flex w-full gap-3 rounded p-3 text-left transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-              selectedConversationId === conversation.id ? "bg-emerald-50" : ""
+            className={`flex w-full gap-3 rounded p-3 text-left transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:hover:bg-slate-800 ${
+              selectedConversationId === conversation.id ? "bg-emerald-50 dark:bg-emerald-950" : ""
             }`}
             type="button"
             aria-current={selectedConversationId === conversation.id ? "true" : undefined}
@@ -81,15 +84,15 @@ export function ConversationList({
             <span className="min-w-0 flex-1">
               <span className="flex items-center justify-between gap-3">
                 <span className="truncate text-sm font-semibold">{conversation.contactName}</span>
-                <span className="shrink-0 text-xs text-slate-500">
+                <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400">
                   {formatConversationDate(conversation.lastMessageAt)}
                 </span>
               </span>
-              <span className="mt-1 block truncate text-sm text-slate-600">
+              <span className="mt-1 block truncate text-sm text-slate-600 dark:text-slate-300">
                 {conversation.lastMessage}
               </span>
               <span className="mt-2 flex items-center justify-between gap-2">
-                <span className="truncate text-xs text-slate-400">
+                <span className="truncate text-xs text-slate-400 dark:text-slate-500">
                   {formatPhone(conversation.contactPhone)}
                 </span>
                 {conversation.unread > 0 ? (
