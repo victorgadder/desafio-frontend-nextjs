@@ -222,13 +222,18 @@ export function InboxApp() {
     sendMutation.mutate({ conversationId: selectedConversationId, text });
   }
 
-  const isInitialLoading = meQuery.isLoading || conversationsQuery.isLoading;
-  const hasInitialError = meQuery.isError || conversationsQuery.isError;
+  const isConversationsLoading = conversationsQuery.isLoading;
+  const hasConversationsError = conversationsQuery.isError;
 
   return (
     <main className="min-h-screen bg-[#f5f7f8] text-slate-950">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-4 sm:px-6 lg:px-8">
-        <AppHeader agent={meQuery.data} isLoading={meQuery.isLoading} />
+        <AppHeader
+          agent={meQuery.data}
+          isLoading={meQuery.isLoading}
+          isError={meQuery.isError}
+          onRetry={() => meQuery.refetch()}
+        />
 
         <section className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[380px_minmax(0,1fr)]">
           <aside className="min-h-[320px] overflow-hidden rounded border border-slate-200 bg-white">
@@ -260,8 +265,8 @@ export function InboxApp() {
             <ConversationList
               conversations={filteredConversations}
               selectedConversationId={selectedConversationId}
-              isLoading={isInitialLoading}
-              isError={hasInitialError}
+              isLoading={isConversationsLoading}
+              isError={hasConversationsError}
               search={search}
               onRetry={() => conversationsQuery.refetch()}
               onSelectConversation={handleSelectConversation}
@@ -298,7 +303,25 @@ export function InboxApp() {
   );
 }
 
-function AppHeader({ agent, isLoading }: { agent?: Agent; isLoading: boolean }) {
+function AppHeader({
+  agent,
+  isLoading,
+  isError,
+  onRetry,
+}: {
+  agent?: Agent;
+  isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
+}) {
+  const agentInitials = agent ? initials(agent.name) : isError ? "!" : "...";
+  const agentName = isLoading
+    ? "Carregando agente"
+    : isError
+      ? "Agente indisponivel"
+      : agent?.name;
+  const agentRole = isError ? "Falha ao carregar perfil" : agent?.role ?? "Suporte";
+
   return (
     <header className="flex flex-col gap-3 pb-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -307,13 +330,28 @@ function AppHeader({ agent, isLoading }: { agent?: Agent; isLoading: boolean }) 
       </div>
 
       <div className="flex items-center gap-3 rounded border border-slate-200 bg-white px-3 py-2">
-        <div className="grid size-9 place-items-center rounded-full bg-slate-900 text-sm font-semibold text-white">
-          {agent ? initials(agent.name) : "..."}
+        <div
+          className={`grid size-9 place-items-center rounded-full text-sm font-semibold text-white ${
+            isError ? "bg-red-600" : "bg-slate-900"
+          }`}
+        >
+          {agentInitials}
         </div>
-        <div>
-          <p className="text-sm font-medium">{isLoading ? "Carregando agente" : agent?.name}</p>
-          <p className="text-xs text-slate-500">{agent?.role ?? "Suporte"}</p>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium">{agentName}</p>
+          <p className={`truncate text-xs ${isError ? "text-red-600" : "text-slate-500"}`}>
+            {agentRole}
+          </p>
         </div>
+        {isError ? (
+          <button
+            className="h-8 rounded border border-red-200 px-3 text-xs font-medium text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+            type="button"
+            onClick={onRetry}
+          >
+            Tentar
+          </button>
+        ) : null}
       </div>
     </header>
   );
