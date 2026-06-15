@@ -4,6 +4,19 @@ Todas as mudanças relevantes deste projeto serão documentadas neste arquivo.
 
 O formato segue uma versão simplificada do [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), com agrupamento por versão e por tipo de alteração.
 
+## [0.1.2] - 2026-06-15
+
+### Alterado
+
+- Substituído o indicador fixo "Online" por um badge de sincronização derivado do estado das queries.
+- O status geral agora pode exibir "Online", "Sincronizando" ou "Offline".
+- Removido o badge fixo da lista de conversas para evitar estados visuais conflitantes.
+
+### Técnico
+
+- O header passou a receber estados de sincronização e falha das queries principais.
+- Adicionado `aria-live="polite"` ao badge para comunicar mudanças de status sem interromper o usuário.
+
 ## [0.1.1] - 2026-06-15
 
 ### Alterado

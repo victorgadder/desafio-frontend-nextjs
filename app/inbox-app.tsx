@@ -232,6 +232,8 @@ export function InboxApp() {
           agent={meQuery.data}
           isLoading={meQuery.isLoading}
           isError={meQuery.isError}
+          isSyncing={meQuery.isFetching || conversationsQuery.isFetching}
+          isOffline={meQuery.isError || conversationsQuery.isError}
           onRetry={() => meQuery.refetch()}
         />
 
@@ -245,9 +247,6 @@ export function InboxApp() {
                     {conversations.length} atendimentos no inbox
                   </p>
                 </div>
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                  Online
-                </span>
               </div>
 
               <label className="mt-4 block">
@@ -307,11 +306,15 @@ function AppHeader({
   agent,
   isLoading,
   isError,
+  isSyncing,
+  isOffline,
   onRetry,
 }: {
   agent?: Agent;
   isLoading: boolean;
   isError: boolean;
+  isSyncing: boolean;
+  isOffline: boolean;
   onRetry: () => void;
 }) {
   const agentInitials = agent ? initials(agent.name) : isError ? "!" : "...";
@@ -329,31 +332,65 @@ function AppHeader({
         <h2 className="text-2xl font-semibold tracking-normal">Inbox de atendimento</h2>
       </div>
 
-      <div className="flex items-center gap-3 rounded border border-slate-200 bg-white px-3 py-2">
-        <div
-          className={`grid size-9 place-items-center rounded-full text-sm font-semibold text-white ${
-            isError ? "bg-red-600" : "bg-slate-900"
-          }`}
-        >
-          {agentInitials}
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{agentName}</p>
-          <p className={`truncate text-xs ${isError ? "text-red-600" : "text-slate-500"}`}>
-            {agentRole}
-          </p>
-        </div>
-        {isError ? (
-          <button
-            className="h-8 rounded border border-red-200 px-3 text-xs font-medium text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500"
-            type="button"
-            onClick={onRetry}
+      <div className="flex flex-col gap-2 sm:items-end">
+        <SyncBadge isOffline={isOffline} isSyncing={isSyncing} />
+
+        <div className="flex items-center gap-3 rounded border border-slate-200 bg-white px-3 py-2">
+          <div
+            className={`grid size-9 place-items-center rounded-full text-sm font-semibold text-white ${
+              isError ? "bg-red-600" : "bg-slate-900"
+            }`}
           >
-            Tentar
-          </button>
-        ) : null}
+            {agentInitials}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">{agentName}</p>
+            <p className={`truncate text-xs ${isError ? "text-red-600" : "text-slate-500"}`}>
+              {agentRole}
+            </p>
+          </div>
+          {isError ? (
+            <button
+              className="h-8 rounded border border-red-200 px-3 text-xs font-medium text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+              type="button"
+              onClick={onRetry}
+            >
+              Tentar
+            </button>
+          ) : null}
+        </div>
       </div>
     </header>
+  );
+}
+
+function SyncBadge({ isOffline, isSyncing }: { isOffline: boolean; isSyncing: boolean }) {
+  const status = isOffline
+    ? {
+        label: "Offline",
+        dotClass: "bg-red-500",
+        className: "border-red-200 bg-red-50 text-red-700",
+      }
+    : isSyncing
+      ? {
+          label: "Sincronizando",
+          dotClass: "bg-amber-500",
+          className: "border-amber-200 bg-amber-50 text-amber-700",
+        }
+      : {
+          label: "Online",
+          dotClass: "bg-emerald-500",
+          className: "border-emerald-200 bg-emerald-50 text-emerald-700",
+        };
+
+  return (
+    <span
+      className={`inline-flex h-8 w-fit items-center gap-2 rounded-full border px-3 text-xs font-medium ${status.className}`}
+      aria-live="polite"
+    >
+      <span className={`size-2 rounded-full ${status.dotClass}`} aria-hidden="true" />
+      {status.label}
+    </span>
   );
 }
 
