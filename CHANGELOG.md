@@ -4,6 +4,33 @@ Todas as mudanças relevantes deste projeto serão documentadas neste arquivo.
 
 O formato segue uma versão simplificada do [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), com agrupamento por versão e por tipo de alteração.
 
+## [0.1.5] - 2026-06-15
+
+### Alterado
+
+- Ajustado o layout do inbox para ocupar a altura da janela, sem rolar a página inteira.
+- A lista de conversas e o histórico do chat agora possuem rolagem interna própria.
+- O composer permanece fixo no rodapé do painel de conversa, semelhante ao comportamento do WhatsApp Desktop.
+- Melhorada a distribuição responsiva entre lista e chat em telas menores.
+
+### Técnico
+
+- Substituídos cálculos fixos de altura por composição com grid/flex, `h-dvh`, `min-h-0` e `overflow-y-auto`.
+- Reduzida a chance de o scroll automático das mensagens deslocar a página inteira.
+
+## [0.1.4] - 2026-06-15
+
+### Alterado
+
+- Separados os componentes visuais do inbox em arquivos menores dentro de `app/_components/inbox`.
+- `app/inbox-app.tsx` passou a concentrar principalmente estado local, queries, mutations e orquestração da tela.
+- Extraídos utilitários de formatação, iniciais, telefone e busca para um módulo compartilhado da feature.
+
+### Técnico
+
+- Melhorada a organização para evidenciar composição de componentes no App Router.
+- Mantido o comportamento existente sem alterar contratos com a API.
+
 ## [0.1.3] - 2026-06-15
 
 ### Alterado
